@@ -5,14 +5,8 @@ The following is a list of the data files availble for download associated with 
 
 ## Chapter 8
 
-* ALL.chr21.vcf.gz
-* BMI_pheno.txt
-* 1kg_EU_qc.bim, 1kg_EU_qc.bed, 1kg_EU_qc.fam
-* hapmap-ceu.bim, hapmap-ceu.bed, hapmap-ceu.fam
-* list.txt
-* 1kg_hm3.bim, 1kg_hm3.bed, 1kg_hm3.fam
-* individuals_failQC.txt
 * hello_world.sh
+* syntax_chapter8.sh
 
 The hapmap-ceu file can be found at http://zzz.bwh.harvard.edu/plink/dist/hapmap-ceu.zip. This file contains the genotypes, map files, and two extra phenotype files that we describe shortly and is called hapmap-ceu.zip.
 
