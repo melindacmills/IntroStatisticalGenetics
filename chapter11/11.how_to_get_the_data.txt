@@ -1,0 +1,127 @@
+###############################################################################################
+###################            Syntax Chapter 11 - data    ####################################
+###############################################################################################
+
+
+################### RStudio and R
+
+RStudio can be downloaded at: https://www.rstudio.com/products/rstudio/download/
+
+For this book we have used the freely available RStudio Desktop Open Source License. 
+The book that is used in this version is RStudio Desktop 1.1.463. You will need to select the appropriate OS and follow the instructions on the website. This means downloading it, saving it in the appropriate directory. Note that RStudio also requires that you have R which you can download at: http://cran.rstudio.com/ . In this book we use the version R-3.5.2. Since there are many online tutorials and books on using RStudio and R we do not replicate that material here. 
+
+################### Health and Retirement Survey
+
+In part three of book and specifically Chapter 11, we turn to more advanced applications such as causal modelling and regression analysis using polygenic scores. Here we provide several practical examples based on real findings from the research literature using the publicly available data from the Health and Retirement Survey, a longitudinal large-scale study of the US population of 50+ (HRS, see Box 7.1). 
+
+To obtain access to the data, you first need to register on the HRS website (see Box A.1 for full instructions). You need to provide your email address, username and some more information and will receive a password which in tandem with your username allows you to access the data download platform. Eventually, you can enter the download portal with your username and password and most likely, we anticipate that you will get very nervous. It seems like a jungle of data, because HRS is a long-time ongoing study with excellent (and multiple) resources. Luckily, the different data waves in HRS have been merged and harmonized into the so-called RAND datasets. Nonetheless, do read the introduction and documentation info provided first before you start using the data.
+
+As you know, throughout this book, we use R since it is not only excellent but also open source. On the download page of HRS, data is mainly provided in SPSS, Stata and SAS format. It is possible to download these files and follow the instruction in the accompanied document to combine the ASCII files containing the data with the respective software information and subsequently read these files into R, for example, with the foreign package for SPSS and Stata format. However, ideally, try to use the following script to directly download the data via RStudio. Again, all you need is your username and password. But first we set up the required software packages:
+
+#### Let's get the Health and Retirement Study on your computer
+# First we need to install and activate a couple of helper packages:
+# devtools works in the background for us, allowing us to download 
+# the packages lodown etc. to download the data
+
+install.packages("devtools")
+library(devtools)
+
+# we download and activate the helper package "lodown"
+
+install_github("ajdamico/lodown")
+library(lodown)
+
+#### Let's download data
+
+# if you would like to download all of the HRS data that you see on 
+# the website, this would be the command
+# Achtung, this might take a while
+
+lodown( "hrs" , output_dir = getwd() , 
+        your_username = "your username" , 
+        your_password = "your password" )
+
+For this exercise, we do not need all of the data available from HRS, but can focus on specific versions and subsets, which we can download like this:
+
+#### Let's focus on specific datasets
+# First, create a list of available data sets and define the download # destination using output_dir. 
+#In our case we park it in the R 
+# project folder
+
+hrs_cat <-
+  get_catalog( "hrs" ,
+               output_dir = getwd() , 
+               your_username = "your username" , 
+               your_password = "your password" )
+
+# if you execute the command:
+ 
+view(hrs_cat)
+
+# in RStudio, you can see the available datasets in 
+# parallel to the website
+
+# First define the first dataset we wish to download, namely the 
+# PGSs: PGENSCORE3.zip
+
+PGS <- subset( hrs_cat , grepl( 'PGENSCORE3.zip' , file_name ) )
+
+# download the data
+
+PGS <- lodown( "hrs" , PGS,
+               your_username = "your username" , 
+               your_password = "your password" )
+
+
+# Next define the second dataset we wish to download, 
+# namely the RAND longitudinal data: randhrs1992_2014v2_STATA.zip
+
+Pheno <- subset( hrs_cat , grepl( 'randhrs1992_2014v2_STATA.zip' , file_name ))
+
+#### download the data
+Pheno <- lodown( "hrs" , Pheno,
+               your_username = "your username" , 
+               your_password = "your password" )
+
+Now we can read the data into RStudio. Since we want to analyse the rich environmental (socioeconomic and demographic) information in the RAND data together with the information from the PGSs, we need to match both data frames. In HRS, there is a household identifier (hhid) and a person identifier (pn) and together they uniquely identify individuals in the data, and therefore can be used to merge the PGSs with the phenotypes.
+
+# read in the data frame for the PGS
+
+hrs_PGS <- readRDS("PGENSCORE3/pgenscore3e_r.rds")
+
+# read in the data frame for the Phenos
+
+hrs_Phenos <- readRDS("randhrs1992_2014v2_STATA/randhrs1992_2014v2.rds")
+
+# merge data frames
+
+hrs_GePhen <- merge(hrs_PGS,hrs_Phenos,by=c("hhid","pn"))
+
+
+Note that the HRS PGS data is available for African ancestry (PGENSCORE3A_R) and European ancestry (PGENSCORE3E_R) and we will focus on the latter in our examples. While the RAND data contains 37,495 individuals, genotype information is available for 12,090 individuals of European ancestry and only those who were in both original data frames end up in the merged one. 
+
+For the PGS-phenotype file, we end up with 12,090 unrelated individuals. However, there are still multiple members of the household, and we want to focus on individuals who do not share their micro environment, because this might bias estimates due to, such as gene-environment correlation (see also Chapter 6). We therefore select only one individual per household.
+
+#### Select one individual per household
+# First, we install and load the helper package “dplyr”
+
+install.packages("dplyr")
+library(dplyr)
+
+# Then we create a variable (whh_count), which numbers individuals 
+# within housholds
+
+hrs_GePhen_ci <-hrs_GePhen %>% group_by(hhid) %>% dplyr::mutate(whh_count = row_number())
+
+# We keep arbitrarily always the first person in the 
+# household
+
+hrs_GePhen_uni <- hrs_GePhen_ci[ which(hrs_GePhen_ci$wf_count =="1"),]
+
+# Finally, we clean the working space in RStudio
+
+rm(hrs_PGS,hrs_GePhen_ci,hrs_GePhen,hrs_Phenos)
+
+
+The data file we are using from here is named hrs_GePhen_uni and contains 8,451 individuals and 11,523 variables. Be sure before embarking on the analyses in Chapter 11 that you also have the same number. 
+
