@@ -1,42 +1,51 @@
-# Syntax Chapter 9     
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+# Syntax Chapter 9    
 
 ## Data used in this chapter:
-* aaa
-* bbb
-* ccc
+* 1kg_EU_BMI.bim, 1kg_EU_BMI.bed, 1kg_EU_BMI.fam
+* 1kg_EU_Overweight.bim, 1kg_EU_Overweight.bed, 1kg_EU_Overweight.fam
+* 1kg_hm3_qc.bim, 1kg_hm3_qc.bed, 1kg_hm3_qc.fam
+* hapmap-ceu.bim, hapmap-ceu.bed, hapmap-ceu.fam
+* 1kg_samples.txt
+* 1kg_samples_EUR.txt
+* BMI_pheno.txt
 
 
 ## 9.2 Association Analysis
 ```
-./plink    	 --bfile 1kg_EU_BMI \
-        	 --snps rs9674439 \
-       	 --assoc \
-      	 --linear \
-      	 --out BMIrs9674439
+./plink --bfile 1kg_EU_BMI \
+        --snps rs9674439 \
+       	--assoc \
+      	--linear \
+      	--out BMIrs9674439
 ```
 
 ```
-./plink    	 --bfile 1kg_EU_Overweight \
-        	 --snps rs9674439 \
-       	 --assoc \
-      	 --logistic \
-      	 --out Overweight_rs9674439
+./plink --bfile 1kg_EU_Overweight \
+        --snps rs9674439 \
+       	--assoc \
+        --logistic \
+      	--out Overweight_rs9674439
 ```
 
 
 ```
-./plink    	 --bfile 1kg_EU_BMI \
-        	 --snps rs9674439 \
-       	 --assoc \
-      	 --linear dominant \
-      	 --out BMIrs9674439
+./plink --bfile 1kg_EU_BMI \
+        --snps rs9674439 \
+       	--assoc \
+      	--linear dominant \
+      	--out BMIrs9674439
 ```		 
 
 ```		 
-./plink    	 --bfile 1kg_EU_BMI \
-       	 --assoc \
-      	 --linear \
-      	 --out BMIgwas
+./plink --bfile 1kg_EU_BMI \
+       	--assoc \
+      	--linear \
+      	--out BMIgwas
 ```		 
 
 
@@ -46,16 +55,16 @@
 ```
 
 ```
-./plink 	  --bfile 1kg_hm3_qc --maf 0.01 \
+./plink --bfile 1kg_hm3_qc --maf 0.01 \
         --indep-pairwise 50 5 0.2 \
         --out 1kg_hm3_qc_pruned
 ```
 
 ```
 ./plink	--bfile 1kg_hm3_qc \
-	--extract 1kg_hm3_qc_pruned.prune.in \
-	--make-bed \
- 		--out 1kg_hm3_pruned
+        --extract 1kg_hm3_qc_pruned.prune.in \
+        --make-bed \
+        --out 1kg_hm3_pruned
 ```
 
 ## 9.4 Population Stratification
@@ -71,7 +80,7 @@
 ### Panel A
 ```
 library(ggplot2)
-columns=c("fid", "Sample.name", "pca1", "pca2", "pca3", "pca4",   "pca5", "pca6", "pca7", "pca8", "pca9", "pca10")
+columns=c("fid", "Sample.name", "pca1", "pca2", "pca3", "pca4", "pca5", "pca6", "pca7", "pca8", "pca9", "pca10")
 
 pca<- read.table(file="1kg_pca.eigenvec", sep = "", header=F, col.names=columns)[,c(2:12)]
 
@@ -79,7 +88,7 @@ ggplot(pca, aes(x=pca1, y=pca2))+ geom_point()+ theme_bw()+  xlab("PC1") + ylab(
 ```
 
 
-#### Panel B
+### Panel B
 ```
 geo <- read.table(file="1kg_samples.txt", sep = "\t",header=T)[,c(1,4,5,6,7)]
 
@@ -88,11 +97,8 @@ data <- merge(geo, pca, by="Sample.name")
 ggplot(data, aes(x=pca1, y=pca2, col=Superpopulation.name))+
      	 geom_point()+ theme_bw()+
      	 xlab("PC1") + ylab("PC2")+
- 	 labs(col = "")
+ 	     labs(col = "")
 ```
-
-
-
 
 ## 9.5 Genetic Relatedness
 ```
@@ -102,11 +108,11 @@ ggplot(data, aes(x=pca1, y=pca2, col=Superpopulation.name))+
 ```
 
 ```
-./gcta64	--bfile 1kg_EU_BMI \
- 	 	--autosome \
- 	--maf 0.01 \
- 	--make-grm \
- 	--out 1kg_gcta 
+./gcta64  --bfile 1kg_EU_BMI \
+          --autosome \
+          --maf 0.01 \
+          --make-grm \
+          --out 1kg_gcta 
 ```
 
 ```
