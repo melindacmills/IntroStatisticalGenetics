@@ -1,5 +1,5 @@
 # IntroStatisticalGenetics
-GitHub site to accompany Textbook Introduction to Statistical Genetics
+GitHub site to accompany Textbook Introduction to Statistical Genetic Data Analysis by Melinda C. Mills, Nicola Barban and Felix C.Tropf at: https://mitpress.mit.edu/books/introduction-statistical-genetic-data-analysis
 
 The following is a list of the data files availble for download associated with each book chapter. Visit this book’s companion website at http://www.intro-statistical-genetics.com
 
